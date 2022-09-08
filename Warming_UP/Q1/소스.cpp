@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 
@@ -17,6 +18,9 @@ void Sub();
 void Determinant();
 void Transposed_matrix();
 void Change4X4();
+
+double DetMat(int mat[][4], int size);
+double CofacMat(int mat[][4], int p, int q, int size);
 
 int main()
 {
@@ -86,7 +90,7 @@ void Core(char act)
 		Transposed_matrix();
 		break;
 	case 'h':
-
+		Change4X4();
 		break;
 	case 's':
 		break;
@@ -227,5 +231,91 @@ void Transposed_matrix()
 
 void Change4X4()
 {
+	cout << "======================================\n";
+	int FirstTransposed[4][4] = { 0 };
+	int SecondTransposed[4][4] = { 0 };
+	double factor;
 
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			FirstTransposed[i][j] = FirstValue[i][j];
+			if (i == 3 || j == 3) {
+				FirstTransposed[i][j] = 0;
+			}
+		}
+	}
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			SecondTransposed[i][j] = SecondValue[i][j];
+			if (i == 3 || j == 3) {
+				SecondTransposed[i][j] = 0;
+			}
+		}
+	}
+
+	FirstTransposed[3][3] = 1;
+	SecondTransposed[3][3] = 1;
+
+	cout << "First Transposed\n";
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			cout << FirstTransposed[i][j];
+			if (j < 3) cout << " ";
+		}
+		cout << endl;
+	}
+	cout << "First Determinant : " << DetMat(FirstTransposed, 4) << endl;
+
+	cout << "\nSecond Transposed\n";
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			cout << SecondTransposed[i][j];
+			if (j < 3) cout << " ";
+		}
+		cout << endl;
+	}
+	cout << "Second Determinant : " << DetMat(SecondTransposed, 4) << endl;
+
+	cout << "======================================\n";
+}
+
+double DetMat(int mat[][4], int size) {
+	int p = 0;
+	int q = 0;
+	double det = 0;
+	if (size == 1) {
+		return mat[0][0];
+	}
+	else if ( size == 2 ) { 
+		return mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+	}
+	else {
+		for (q = 0, det = 0; q < size; q++) {
+			det = det + mat[0][q] * CofacMat(mat, 0, q, size);
+		}
+		return det;
+	}
+	return 0;
+}
+
+double CofacMat(int mat[][4], int p, int q, int size) {
+	int i = 0, j = 0;
+	int x=0, y=0;
+	int cmat[4][4] = { };
+	double cofactor=0;
+
+	for (i=0,x=0 ; i<size ; i++) {
+		if (i != p) {
+			for (j=0,y=0 ; j<size ; j++) {
+				if (j != q) {
+					cmat[x][y] = mat[i][j];
+					y++;
+				}
+			}
+			x++;
+		}
+	}
+	cofactor = pow(-1,p)*pow(-1,q)*DetMat(cmat,size-1); 
+
+	return cofactor;
 }
